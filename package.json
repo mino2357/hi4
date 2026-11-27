@@ -1,0 +1,11 @@
+{
+  "name": "hi4",
+  "private": true,
+  "description": "直列 4 気筒・直噴・ターボ過給ガソリン機関の 1 次元シミュレータ",
+  "scripts": {
+    "check": "node tools/dev/index.js --check",
+    "index": "node tools/dev/index.js",
+    "scope": "node tools/dev/scope.js",
+    "decide": "node tools/dev/decide.js"
+  }
+}
