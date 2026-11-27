@@ -175,7 +175,7 @@
 | `tools/dev/docs.js` | 6164 |
 | `tools/dev/index.js` | 4281 |
 | `tools/dev/model.js` | 14238 |
-| `tools/dev/model_page.js` | 4210 |
+| `tools/dev/model_page.js` | 4537 |
 | `tools/dev/model_selftest.js` | 2768 |
 | `tools/dev/scope.js` | 1401 |
 | `docs/changes/2026-11-27-req-stage1.md` | 4785 |
