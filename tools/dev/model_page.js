@@ -17,8 +17,8 @@ function write(A,files,out,nodes){const want=nodes.length?nodes:[...new Set(A.eq
  "<script>window.MathJax={tex:{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]},svg:{fontCache:'global'}};</script>",
  '<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>','<main>',
  '<h1>'+name+'の式（承認用．式の断片から自動で作ったページ）</h1>',
- '<p class="m">式の正本は <code>docs/model/eq-*.md</code>．どの式にも「式との一致」が，釣り合いの式と状態量の式には「保存」が，自動で確かめることとして付く．ここに並べる「確かめること」は，それ以外のものだけ．</p>',
- '<p class="m">判定：A は丸めの上界 \\(\\lvert r\\rvert\\le c\\,\\gamma_N S\\)，B は収束の次数 \\(p_{obs}\\ge p-\\delta\\)，C は名前を付けた設定，– は数で判定しないもの．自動で付く「式との一致」と「保存」は A．</p>');
+ '<p class="m">式の正本は <code>docs/model/eq-*.md</code>．式の下に並ぶのは，その式を対象にする確かめること．保存（質量，エネルギー，原子）は，系の全体で 1 回ずつ確かめるので，ここには並べない．</p>',
+ '<p class="m">判定：A は丸めの上界 \\(\\lvert r\\rvert\\le c\\,\\gamma_N S\\)，B は収束の次数 \\(p_{obs}\\ge p-\\delta\\)，C は名前を付けた設定，– は数で判定しないもの．保存は A．</p>');
  for(const node of want){const es=A.eqs.filter(e=>e.node===node);if(!es.length)continue;o.push('<h2>'+node+'</h2>');
   const q=[...new Set(es.flatMap(e=>[...e.defines,...e.uses]))].filter(x=>A.qs[x]);
   o.push('<div class="tw"><table><tr><th>記号</th><th>意味</th><th>単位</th><th>種類</th></tr>'+q.map(x=>'<tr><td>'+inl(A.qs[x].tex)+'</td><td>'+inl(A.qs[x].mean)+'</td><td>'+A.qs[x].unit+'</td><td>'+A.qs[x].kind+'</td></tr>').join('')+'</table></div>');

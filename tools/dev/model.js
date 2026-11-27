@@ -59,14 +59,24 @@ function analyze(files,reqs){const errors=[],notes=[],E=m=>errors.push(m);
  if(reqs)for(const f of Object.keys(e_src))for(const r of e_src[f]){if(reqs[r]===undefined)continue;if(!reqs[r].includes('docs/model/'+f)&&!OLD.includes(r))E('要求 '+r+' の本文が，式のファイル docs/model/'+f+' を指していない')}
  const byT={};for(const k of ks)for(const t of k.target){const key=t+'／'+k.type;(byT[key]=byT[key]||[]).push(k)}
  for(const key of Object.keys(byT)){const tl=[...new Set(byT[key].map(k=>k.tol))];if(tl.length>1)notes.push('同じ対象と種類に，違う判定：'+key+' → '+byT[key].map(k=>k.id+'（'+k.crit+'，'+k.tol+'）').join('，'))}
+ /* 覆い：確かめること 1 行が判定するのは，その行の「対象」の式（その検査が，誤りを見分けるように作られた式）．
+    たどって通るだけの式は数えない（管の式は互いにつながっていて，どの検査もほとんどの式を通るので，区別にならない）．
+    保存は，系の全体で 3 つ（質量，エネルギー，原子）にまとめ，釣り合いの式と状態量の式の全部を対象にする．
+    どの行の対象にもならない式には，「式との一致」（基準の値を 1 組入れて，式の値と比べる）を自動で付ける． */
+ const bal=eqs.filter(e=>e.kind==='釣り合い'||e.defines.some(q=>qs[q]&&qs[q].kind==='状態')).map(e=>e.id);
+ const cov={};for(const k of ks)cov[k.id]=new Set(k.target);
+ const cnt={};for(const e of eqs)cnt[e.id]=ks.filter(k=>cov[k.id].has(e.id)).length;
+ const lone=eqs.filter(e=>cnt[e.id]===0&&!bal.includes(e.id));
+ const sig={};for(const k of ks){const g=k.crit+'／'+k.type+'／'+[...k.target].sort().join(' ');(sig[g]=sig[g]||[]).push(k.id)}
+ for(const g of Object.keys(sig))if(sig[g].length>1)notes.push('同じ要求・種類・対象の行が重なっている（1 つにまとめられないか）：'+sig[g].join(' ')+'（'+g+'）');
  /* 報告 */
  const o=['# 検査の結果（自動生成）','','`npm run model` が作る．手で書き換えない．定めは `README.md`．','','量 '+Object.keys(qs).length+' 個，式 '+eqs.length+' 本，確かめること '+ks.length+' 行．','','## 1. 誤り','',errors.length?errors.map(e=>'- '+e).join('\n'):'無し．','','## 2. 知らせ（誤りではない）','',notes.length?notes.map(e=>'- '+e).join('\n'):'無し．','','## 3. 節点ごとの，量と，それを定める式','','切替の形ごと．「使う式」は，その量が現れるほかの式．'];
  for(const r of rep){o.push('','### '+r.node+(r.form?'［'+r.form+'］':''),'','| 量 | 意味 | 種類 | 定める式 | 使う式 |','| :--- | :--- | :--- | :--- | :--- |');const act=eqs.filter(e=>!e.variant||e.variant===r.form);
   for(const q of r.us)o.push('| '+q+' '+qs[q].tex+' | '+qs[q].mean+' | '+qs[q].kind+' | '+(act.filter(e=>e.defines.includes(q)).map(e=>e.id).join(' ')||'**無し**')+' | '+(act.filter(e=>e.uses.includes(q)).map(e=>e.id).join(' ')||'–')+' |')}
- o.push('','## 4. 式ごとの，確かめること','','「自動で付くもの」は README の決まり 2．','| 式 | 題 | 自動で付くもの | 表に書いたもの（要求，種類，判定） |','| :--- | :--- | :--- | :--- |');
- for(const e of eqs){const auto=['式との一致（A）'];if(e.kind==='釣り合い'||e.defines.some(q=>qs[q]&&qs[q].kind==='状態'))auto.push('保存（A）');
-  o.push('| '+e.id+' | '+e.title+' | '+auto.join('，')+' | '+(ks.filter(k=>k.target.includes(e.id)).map(k=>k.id+'（'+k.crit+'，'+k.type+'，'+k.tol+'）').join(' ')||'–')+' |')}
- return{errors,notes,report:o.join('\n')+'\n',eqs,qs,ks}}
+ o.push('','## 4. 検査の数と，式ごとの対象','','検査は 3 種類だけ：(1) 表に書いた行（対象の式の誤りを見分けるもの），(2) 保存（系の全体で，質量，エネルギー，原子の 3 つ．釣り合いの式と状態量の式の全部が対象），(3) 式との一致（どの行の対象にもならない式だけ．基準の値を 1 組）．','',
+  '数：表の行 '+ks.length+'，保存 3，式との一致 '+lone.length+'（計 '+(ks.length+3+lone.length)+'）．式 '+eqs.length+' 本のうち，表の行が対象にする式 '+eqs.filter(e=>cnt[e.id]>0).length+' 本，保存だけが対象にする式 '+eqs.filter(e=>cnt[e.id]===0&&bal.includes(e.id)).length+' 本．','','| 式 | 題 | 表の行 | 保存 | 式との一致 |','| :--- | :--- | :--- | :--- | :--- |');
+ for(const e of eqs)o.push('| '+e.id+' | '+e.title+' | '+(ks.filter(k=>cov[k.id].has(e.id)).map(k=>k.id).join(' ')||'–')+' | '+(bal.includes(e.id)?'○':'')+' | '+(lone.includes(e)?'○':'')+' |');
+ return{errors,notes,report:o.join('\n')+'\n',eqs,qs,ks,cov,bal,lone}}
 function readAll(){const files={};for(const f of fs.readdirSync(dir))if(f.endsWith('.md')&&f!=='REPORT.md'&&f!=='README.md')files[f]=fs.readFileSync(path.join(dir,f),'utf8');
  const reqs={};for(const f of Object.keys(files))for(const m of files[f].matchAll(/\b(R-\d\d)\b/g))if(!reqs[m[1]])reqs[m[1]]=fs.readFileSync(path.join(root,'docs/requirements',m[1]+'.md'),'utf8');return{files,reqs}}
 module.exports={analyze,readAll,dir};
@@ -78,6 +88,8 @@ if(require.main===module){const{files,reqs}=readAll(),A=analyze(files,reqs),args
  if(args[0]==='--scope'){const node=args[1],es=A.eqs.filter(e=>e.node===node);if(!es.length){console.log('節点 '+node+' に式が無い');process.exit(1)}
   const fl=[...new Set(es.map(e=>e.file))],q=[...new Set(es.flatMap(e=>[...e.defines,...e.uses]))].sort(),ks=A.ks.filter(k=>k.target.some(t=>es.some(e=>e.id===t)));
   console.log('節点 '+node+'：読むのは次だけ\n  '+fl.map(f=>'docs/model/'+f+'（'+[...files[f]].length+' 字）').join('\n  ')+'\n  量（'+q.length+' 個．量の表のこの行だけ）：'+q.join(' ')+'\n  確かめること：'+(ks.map(k=>k.id).join(' ')||'–')+'\n  要求：'+[...new Set(fl.flatMap(f=>(/^source: (.*)$/m.exec(files[f])||[])[1].split(' ')))].join(' '));process.exit(0)}
+ if(args[0]==='--tests'){const ids=args.slice(1),hit=A.ks.filter(k=>ids.some(i=>A.cov[k.id].has(i))),b=ids.some(i=>A.bal.includes(i)),l=ids.filter(i=>A.lone.some(e=>e.id===i));
+  console.log('式 '+ids.join(' ')+' を変えたときに，やり直す検査：\n  表の行（'+hit.length+' ／ '+A.ks.length+'）：'+(hit.map(k=>k.id+'（'+k.crit+'，'+k.type+'）').join(' ')||'–')+'\n  保存：'+(b?'やり直す（3 つ）':'やり直さない')+'\n  式との一致：'+(l.join(' ')||'–')+'\n承認を確かめ直す要求：'+([...new Set(hit.map(k=>k.crit))].sort().join(' ')||'（表の行が無い．式のファイルの source の要求）'));process.exit(0)}
  if(args[0]==='--page'){require('./model_page.js').write(A,files,args[1],args.slice(2));process.exit(0)}
  const dst=path.join(dir,'REPORT.md');
  if(A.errors.length)console.log('[式と量の検査] 誤り '+A.errors.length+' 件\n'+A.errors.join('\n'));

@@ -171,10 +171,10 @@
 | `tools/dev/decide.js` | 2021 |
 | `tools/dev/docs.js` | 6164 |
 | `tools/dev/index.js` | 4281 |
-| `tools/dev/model.js` | 10713 |
-| `tools/dev/model_page.js` | 4231 |
+| `tools/dev/model.js` | 12277 |
+| `tools/dev/model_page.js` | 4210 |
 | `tools/dev/model_selftest.js` | 2768 |
 | `tools/dev/scope.js` | 1401 |
 | `docs/changes/2026-11-27-req-stage1.md` | 4785 |
 | `docs/changes/2026-11-27-scope-decisions.md` | 1568 |
-| `docs/changes/2026-11-28-model-pilot.md` | 3610 |
+| `docs/changes/2026-11-28-model-pilot.md` | 4270 |
