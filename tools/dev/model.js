@@ -84,13 +84,15 @@ function readAll(){const files={};for(const f of fs.readdirSync(dir))if(f.endsWi
  const reqs={};for(const f of Object.keys(files))for(const m of files[f].matchAll(/\b(R-\d\d)\b/g))if(!reqs[m[1]])reqs[m[1]]=fs.readFileSync(path.join(root,'docs/requirements',m[1]+'.md'),'utf8');return{files,reqs}}
 /* 承認のしるし：要求ごとに，その要求が指す式のファイルの中身と，確かめることの行から作ったハッシュ．
    承認したときに docs/model/approved.json に書く（decide.js）．承認の後で式や行が変わると，検査が知らせる． */
-function reqHash(files,r){const h=require('crypto').createHash('sha1');
- for(const f of Object.keys(files).filter(f=>/^eq-/.test(f)).sort()){const m=/^source: (.*)$/m.exec(files[f]);if(m&&m[1].split(/\s+/).includes(r))h.update(f+'\n'+files[f])}
+function reqHash(files,r,body){const h=require('crypto').createHash('sha1'),ids=new Set();
+ /* 要求の本文が名指しする式（E-P01〜E-P09 のような範囲を含む）だけを数える．同じファイルのほかの式が変わっても，承認は古くならない */
+ for(const m of (body||'').matchAll(/E-([A-Z]{1,2})(\d\d)(?:〜E-\1(\d\d))?/g)){const a=+m[2],b=m[3]?+m[3]:a;for(let k=a;k<=b;k++)ids.add('E-'+m[1]+String(k).padStart(2,'0'))}
+ for(const f of Object.keys(files).filter(f=>/^eq-/.test(f)).sort())for(const b of files[f].split(/^### /m).slice(1)){const id=(/^(E-[A-Z]{1,2}\d\d)：/.exec(b)||[])[1];if(ids.has(id))h.update(b.trim())}
  for(const f of Object.keys(files).filter(f=>/^checks-/.test(f)).sort())for(const l of files[f].split('\n'))if(new RegExp('^\\| K-\\d+ \\| '+r+' \\|').test(l))h.update(l+'\n');
  return h.digest('hex').slice(0,16)}
 const apFile=path.join(dir,'approved.json'),readAp=()=>fs.existsSync(apFile)?JSON.parse(fs.readFileSync(apFile,'utf8')):{};
 function stale(files){const ap=readAp(),out=[];for(const r of Object.keys(ap).sort()){const f=path.join(root,'docs/requirements',r+'.md');if(!fs.existsSync(f))continue;
-  if(/^status: 承認$/m.test(fs.readFileSync(f,'utf8'))&&ap[r]!==reqHash(files,r))out.push(r)}return out}
+  const body=fs.readFileSync(f,'utf8');if(/^status: 承認$/m.test(body)&&ap[r]!==reqHash(files,r,body.split(/^---$/m).slice(2).join('')))out.push(r)}return out}
 module.exports={analyze,readAll,dir,reqHash,readAp,apFile,stale};
 if(require.main===module){const{files,reqs}=readAll(),A=analyze(files,reqs),args=process.argv.slice(2);
  if(args[0]==='--impact'){for(const q of args.slice(1)){if(!A.qs[q]){console.log(q+' は量の表に無い');continue}const es=A.eqs.filter(e=>e.defines.includes(q)||e.uses.includes(q));

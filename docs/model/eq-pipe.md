@@ -24,21 +24,21 @@ source: D-02 D-05 D-06 R-01 R-02 R-06
 
 ### E-P03：全エネルギー
 - defines: rhoEA
-- uses: Fhat A Vcell q_w D
+- uses: Fhat A Vcell q_w D qE_cat
 - kind: 釣り合い
 
 ```math
-\mathcal V_i\,\frac{d(\rho E)_i}{dt} = -\left(A_{i+1/2}\hat F^{(E)}_{i+1/2} - A_{i-1/2}\hat F^{(E)}_{i-1/2}\right) + \mathcal V_i\,\frac{4}{D}\,q_{w,i}
+\mathcal V_i\,\frac{d(\rho E)_i}{dt} = -\left(A_{i+1/2}\hat F^{(E)}_{i+1/2} - A_{i-1/2}\hat F^{(E)}_{i-1/2}\right) + \mathcal V_i\left(\frac{4}{D}\,q_{w,i} + \dot q_{E,cat,i}\right)
 ```
 
-### E-P04：成分（CO と NO は反応で変わる）
+### E-P04：成分（CO と NO は気体の中の反応で変わる．触媒の中では，表面との出入りが加わる）
 - defines: rhoYA
-- uses: Fhat A Vcell omega_k
+- uses: Fhat A Vcell omega_k w_cat
 - kind: 釣り合い
-- assumes: 組成=4 成分と CO，NO; 管の中の反応=CO と NO の反応速度
+- assumes: 組成=4 成分と CO，NO，酸素の過不足; 管の中の反応=CO と NO の反応速度
 
 ```math
-\mathcal V_i\,\frac{d(\rho Y_k)_i}{dt} = -\left(A_{i+1/2}\hat F^{(k)}_{i+1/2} - A_{i-1/2}\hat F^{(k)}_{i-1/2}\right) + \mathcal V_i\,\dot\omega_{k,i}, \qquad \sum_k \dot\omega_k = 0
+\mathcal V_i\,\frac{d(\rho Y_k)_i}{dt} = -\left(A_{i+1/2}\hat F^{(k)}_{i+1/2} - A_{i-1/2}\hat F^{(k)}_{i-1/2}\right) + \mathcal V_i\left(\dot\omega_{k,i} + \dot\omega_{k,cat,i}\right), \qquad \sum_k \dot\omega_k = 0
 ```
 
 ### E-P05：密度
