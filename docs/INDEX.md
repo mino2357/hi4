@@ -176,4 +176,4 @@
 | `tools/dev/scope.js` | 1401 |
 | `docs/changes/2026-11-27-req-stage1.md` | 4785 |
 | `docs/changes/2026-11-27-scope-decisions.md` | 1568 |
-| `docs/changes/2026-11-28-model-pilot.md` | 1001 |
+| `docs/changes/2026-11-28-model-pilot.md` | 2140 |
