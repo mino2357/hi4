@@ -163,11 +163,14 @@
 
 | ファイル | 字数 |
 | :--- | ---: |
-| `CLAUDE.md` | 4081 |
+| `CLAUDE.md` | 4565 |
 | `README.md` | 372 |
 | `tools/dev/decide.js` | 2021 |
 | `tools/dev/docs.js` | 6164 |
 | `tools/dev/index.js` | 4281 |
+| `tools/dev/model.js` | 9738 |
+| `tools/dev/model_selftest.js` | 2632 |
 | `tools/dev/scope.js` | 1401 |
 | `docs/changes/2026-11-27-req-stage1.md` | 4785 |
 | `docs/changes/2026-11-27-scope-decisions.md` | 1568 |
+| `docs/changes/2026-11-28-model-pilot.md` | 1001 |
