@@ -64,12 +64,12 @@ q_w = h_c\,(T_w - T)
 C_w\,\frac{dT_w}{dt} = -q_w A_i - h_e A_e\,(T_w - T_{amb})
 ```
 
-### E-U02：壁温（触媒の担体．表面の反応の熱と，軸方向の熱伝導を含む）
+### E-U02：壁温（触媒の担体．軸方向の熱伝導を含む）
 - defines: Tw
-- uses: C_mono q_w Ai Vcell qE_cat G_s he Ae Tamb
+- uses: C_mono q_w Ai G_s he Ae Tamb
 - kind: 釣り合い
 - variant: 壁温=触媒の担体
 
 ```math
-C_{mono}\,\frac{dT_{w,i}}{dt} = -q_{w,i} A_i - \mathcal V_i\,\dot q_{E,cat,i} + G_s\,(T_{w,i+1} - 2T_{w,i} + T_{w,i-1}) - h_e A_e\,(T_{w,i} - T_{amb})
+C_{mono}\,\frac{dT_{w,i}}{dt} = -q_{w,i} A_i + G_s\,(T_{w,i+1} - 2T_{w,i} + T_{w,i-1}) - h_e A_e\,(T_{w,i} - T_{amb})
 ```
