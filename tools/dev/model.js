@@ -82,7 +82,16 @@ function analyze(files,reqs){const errors=[],notes=[],E=m=>errors.push(m);
  return{errors,notes,report:o.join('\n')+'\n',eqs,qs,ks,cov,bal,lone}}
 function readAll(){const files={};for(const f of fs.readdirSync(dir))if(f.endsWith('.md')&&f!=='REPORT.md'&&f!=='README.md')files[f]=fs.readFileSync(path.join(dir,f),'utf8');
  const reqs={};for(const f of Object.keys(files))for(const m of files[f].matchAll(/\b(R-\d\d)\b/g))if(!reqs[m[1]])reqs[m[1]]=fs.readFileSync(path.join(root,'docs/requirements',m[1]+'.md'),'utf8');return{files,reqs}}
-module.exports={analyze,readAll,dir};
+/* 承認のしるし：要求ごとに，その要求が指す式のファイルの中身と，確かめることの行から作ったハッシュ．
+   承認したときに docs/model/approved.json に書く（decide.js）．承認の後で式や行が変わると，検査が知らせる． */
+function reqHash(files,r){const h=require('crypto').createHash('sha1');
+ for(const f of Object.keys(files).filter(f=>/^eq-/.test(f)).sort()){const m=/^source: (.*)$/m.exec(files[f]);if(m&&m[1].split(/\s+/).includes(r))h.update(f+'\n'+files[f])}
+ for(const f of Object.keys(files).filter(f=>/^checks-/.test(f)).sort())for(const l of files[f].split('\n'))if(new RegExp('^\\| K-\\d+ \\| '+r+' \\|').test(l))h.update(l+'\n');
+ return h.digest('hex').slice(0,16)}
+const apFile=path.join(dir,'approved.json'),readAp=()=>fs.existsSync(apFile)?JSON.parse(fs.readFileSync(apFile,'utf8')):{};
+function stale(files){const ap=readAp(),out=[];for(const r of Object.keys(ap).sort()){const f=path.join(root,'docs/requirements',r+'.md');if(!fs.existsSync(f))continue;
+  if(/^status: 承認$/m.test(fs.readFileSync(f,'utf8'))&&ap[r]!==reqHash(files,r))out.push(r)}return out}
+module.exports={analyze,readAll,dir,reqHash,readAp,apFile,stale};
 if(require.main===module){const{files,reqs}=readAll(),A=analyze(files,reqs),args=process.argv.slice(2);
  if(args[0]==='--impact'){for(const q of args.slice(1)){if(!A.qs[q]){console.log(q+' は量の表に無い');continue}const es=A.eqs.filter(e=>e.defines.includes(q)||e.uses.includes(q));
    console.log(q+'（'+A.qs[q].mean+'）\n  定める式：'+(es.filter(e=>e.defines.includes(q)).map(e=>e.id).join(' ')||'–')+'\n  使う式：'+(es.filter(e=>e.uses.includes(q)).map(e=>e.id).join(' ')||'–'));
@@ -96,5 +105,6 @@ if(require.main===module){const{files,reqs}=readAll(),A=analyze(files,reqs),args
  if(args[0]==='--page'){require('./model_page.js').write(A,files,args[1],args.slice(2));process.exit(0)}
  const dst=path.join(dir,'REPORT.md');
  if(A.errors.length)console.log('[式と量の検査] 誤り '+A.errors.length+' 件\n'+A.errors.join('\n'));
+ const st=stale(files);if(st.length){console.log('[式と量の検査] 承認の後で，式か確かめることが変わった要求：'+st.join(' ')+'\n  → npm run decide -- 案 '+st.join(' ')+' で戻し，変えた所を示して承認を確かめ直す');if(args.includes('--check'))process.exit(1)}
  if(args.includes('--check')){if(A.errors.length)process.exit(1);if((fs.existsSync(dst)?fs.readFileSync(dst,'utf8'):'')!==A.report){console.log('[式と量の検査] docs/model/REPORT.md が古い（npm run model で作り直す）');process.exit(1)}console.log('式と量の検査 OK（量 '+Object.keys(A.qs).length+'，式 '+A.eqs.length+'，確かめること '+A.ks.length+'）')}
  else{fs.writeFileSync(dst,A.report);console.log('docs/model/REPORT.md を書いた．誤り '+A.errors.length+'，知らせ '+A.notes.length);process.exit(A.errors.length?1:0)}}

@@ -168,10 +168,10 @@
 | :--- | ---: |
 | `CLAUDE.md` | 4565 |
 | `README.md` | 372 |
-| `tools/dev/decide.js` | 2021 |
+| `tools/dev/decide.js` | 2283 |
 | `tools/dev/docs.js` | 6164 |
 | `tools/dev/index.js` | 4281 |
-| `tools/dev/model.js` | 12663 |
+| `tools/dev/model.js` | 13884 |
 | `tools/dev/model_page.js` | 4210 |
 | `tools/dev/model_selftest.js` | 2768 |
 | `tools/dev/scope.js` | 1401 |
