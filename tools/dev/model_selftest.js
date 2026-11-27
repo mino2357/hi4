@@ -13,9 +13,9 @@ const T=[
  ['同じ量を 2 本の式で定める',add('eq-compressor.md','\n### E-C09：動力（別の式）\n- defines: P_c\n- uses: mdot_c h02s h01 eta_c\n\n```math\nP_c = \\dot m_c (h_{02s} - h_{01})/\\eta_c\n```\n'),['量 P_c を定める式が 2 本ある'],'errors'],
  ['量を定める式を消す',cut('eq-turbine.md','E-W05'),['量 H_m（twin-scroll：共通の空間の比全 enthalpy）を定める式が無い','に対応する式が無い（式が足りない）'],'errors'],
  ['定義していない量を使う',rep('eq-shaft.md','- uses: I_tc eta_m P_t P_c','- uses: I_tc eta_m P_t P_c x_rg'),['量 x_rg が量の表に無い'],'errors'],
- ['許容値を数で直接書く',rep('checks-turbo.md','| eps_int |','| 1e-6 |'),['K-06 の許容「1e-6」が，量の表の許容に無い'],'errors'],
+ ['判定に数を直接書く',rep('checks-turbo.md','| C eps_cyc |','| 1e-6 |'),['K-12 の判定「1e-6」が読めない'],'errors'],
  ['確かめることの対象に，無い式を書く',rep('checks-turbo.md','| K-07 | R-26 | 極限 | E-G01 |','| K-07 | R-26 | 極限 | E-G09 |'),['K-07 の対象 E-G09 が式に無い'],'errors'],
- ['同じ対象と種類に，違う許容値を掛ける',add('checks-turbo.md','| K-16 | R-25 | 極限 | E-C05 | 別の許容 | eps_int |\n'),['同じ対象と種類に，違う許容値：E-C05／極限'],'notes'],
+ ['同じ対象と種類に，違う設定を掛ける',add('checks-turbo.md','| K-16 | R-27 | 判定 | E-S01 | 別の設定 | C dp_boost |\n'),['同じ対象と種類に，違う判定：E-S01／判定'],'notes'],
  ['要求の本文が式のファイルを指していない',F=>{F.__req=r=>r.replace('docs/model/eq-shaft.md','docs/model/eq-xxx.md')},['要求 R-27 の本文が，式のファイル docs/model/eq-shaft.md を指していない'],'errors'],
  ['入力の量を式で定める',rep('eq-boost.md','- defines: p_boost\n','- defines: p_st\n'),['種類「入力」の量 p_st を定めている'],'errors'],
 ];

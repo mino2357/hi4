@@ -55,16 +55,16 @@ function analyze(files,reqs){const errors=[],notes=[],E=m=>errors.push(m);
  const ks=[];for(const f of Object.keys(files).filter(f=>/^checks-/.test(f)))for(const r of rows(files[f])){const k={id:r[0],crit:r[1],type:r[2],target:list(r[3]).filter(x=>x!=='–'),text:r[4],tol:r[5],file:f};ks.push(k);
   if(!/^R-\d\d$/.test(k.crit))E(f+'：'+k.id+' の基準「'+k.crit+'」が読めない');
   for(const t of k.target)if(!eqs.some(e=>e.id===t))E(f+'：'+k.id+' の対象 '+t+' が式に無い');
-  if(k.tol!=='–'&&(!qs[k.tol]||qs[k.tol].kind!=='許容'))E(f+'：'+k.id+' の許容「'+k.tol+'」が，量の表の許容に無い')}
+  const cm=/^C (\S+)$/.exec(k.tol);if(!['A','B','–'].includes(k.tol)&&!cm)E(f+'：'+k.id+' の判定「'+k.tol+'」が読めない（A，B，C 名前，– のどれか．数を直接書かない）');if(cm&&(!qs[cm[1]]||qs[cm[1]].kind!=='許容'))E(f+'：'+k.id+' の設定「'+cm[1]+'」が，量の表の許容に無い')}
  if(reqs)for(const f of Object.keys(e_src))for(const r of e_src[f]){if(reqs[r]===undefined)continue;if(!reqs[r].includes('docs/model/'+f)&&!OLD.includes(r))E('要求 '+r+' の本文が，式のファイル docs/model/'+f+' を指していない')}
  const byT={};for(const k of ks)for(const t of k.target){const key=t+'／'+k.type;(byT[key]=byT[key]||[]).push(k)}
- for(const key of Object.keys(byT)){const tl=[...new Set(byT[key].map(k=>k.tol))];if(tl.length>1)notes.push('同じ対象と種類に，違う許容値：'+key+' → '+byT[key].map(k=>k.id+'（'+k.crit+'，'+k.tol+'）').join('，'))}
+ for(const key of Object.keys(byT)){const tl=[...new Set(byT[key].map(k=>k.tol))];if(tl.length>1)notes.push('同じ対象と種類に，違う判定：'+key+' → '+byT[key].map(k=>k.id+'（'+k.crit+'，'+k.tol+'）').join('，'))}
  /* 報告 */
  const o=['# 検査の結果（自動生成）','','`npm run model` が作る．手で書き換えない．定めは `README.md`．','','量 '+Object.keys(qs).length+' 個，式 '+eqs.length+' 本，確かめること '+ks.length+' 行．','','## 1. 誤り','',errors.length?errors.map(e=>'- '+e).join('\n'):'無し．','','## 2. 知らせ（誤りではない）','',notes.length?notes.map(e=>'- '+e).join('\n'):'無し．','','## 3. 節点ごとの，量と，それを定める式','','切替の形ごと．「使う式」は，その量が現れるほかの式．'];
  for(const r of rep){o.push('','### '+r.node+(r.form?'［'+r.form+'］':''),'','| 量 | 意味 | 種類 | 定める式 | 使う式 |','| :--- | :--- | :--- | :--- | :--- |');const act=eqs.filter(e=>!e.variant||e.variant===r.form);
   for(const q of r.us)o.push('| '+q+' '+qs[q].tex+' | '+qs[q].mean+' | '+qs[q].kind+' | '+(act.filter(e=>e.defines.includes(q)).map(e=>e.id).join(' ')||'**無し**')+' | '+(act.filter(e=>e.uses.includes(q)).map(e=>e.id).join(' ')||'–')+' |')}
- o.push('','## 4. 式ごとの，確かめること','','「自動で付くもの」は README の決まり 2．','| 式 | 題 | 自動で付くもの | 表に書いたもの（要求，種類，許容） |','| :--- | :--- | :--- | :--- |');
- for(const e of eqs){const auto=['式との一致（eps_id）'];if(e.kind==='釣り合い'||e.defines.some(q=>qs[q]&&qs[q].kind==='状態'))auto.push('保存（eps_bal）');
+ o.push('','## 4. 式ごとの，確かめること','','「自動で付くもの」は README の決まり 2．','| 式 | 題 | 自動で付くもの | 表に書いたもの（要求，種類，判定） |','| :--- | :--- | :--- | :--- |');
+ for(const e of eqs){const auto=['式との一致（A）'];if(e.kind==='釣り合い'||e.defines.some(q=>qs[q]&&qs[q].kind==='状態'))auto.push('保存（A）');
   o.push('| '+e.id+' | '+e.title+' | '+auto.join('，')+' | '+(ks.filter(k=>k.target.includes(e.id)).map(k=>k.id+'（'+k.crit+'，'+k.type+'，'+k.tol+'）').join(' ')||'–')+' |')}
  return{errors,notes,report:o.join('\n')+'\n',eqs,qs,ks}}
 function readAll(){const files={};for(const f of fs.readdirSync(dir))if(f.endsWith('.md')&&f!=='REPORT.md'&&f!=='README.md')files[f]=fs.readFileSync(path.join(dir,f),'utf8');

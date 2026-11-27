@@ -58,11 +58,5 @@
 | omega_0 | $\omega_{tc}^{(0)}$ | 簡易計算：過給機の角速度の出発点 | rad/s | 未知 | 簡易計算 |
 | p_boost_0 | $p_{boost}^{(0)}$ | 簡易計算：過給圧の出発点 | Pa | 未知 | 簡易計算 |
 | A_wg_0 | $A_{wg}^{(0)}$ | 簡易計算：ウェイストゲートの面積の出発点 | m² | 未知 | 簡易計算 |
-| eps_id | $\varepsilon_{id}$ | 式との一致の許容（相対）$10^{-12}$ | – | 許容 | 系 |
-| eps_bal | $\varepsilon_{bal}$ | 収支の許容（相対）$10^{-9}$ | – | 許容 | 系 |
-| eps_bal12 | $\varepsilon_{bal,12}$ | 保存の許容（相対）$10^{-12}$ | – | 許容 | 系 |
-| eps_int | $\varepsilon_{int}$ | 数値積分との一致の許容（相対）$10^{-6}$ | – | 許容 | 系 |
-| eps_cyc | $\varepsilon_{cyc}$ | 周期定常の判定の値（設定．既定 $10^{-4}$） | – | 許容 | 系 |
-| eps_grow | $\varepsilon_{grow}$ | 成長率の許容（相対）$0.05$ | – | 許容 | 系 |
-| eps_freq | $\varepsilon_{freq}$ | 角振動数の許容（相対）$0.02$ | – | 許容 | 系 |
-| dp_boost | $\Delta p_{boost}$ | 過給圧の制御の許容 $0.5\ \text{kPa}$ | Pa | 許容 | 系 |
+| eps_cyc | $\varepsilon_{cyc}$ | 周期定常とみなす，1 サイクルの相対の変化（利用者の設定） | – | 許容 | 系 |
+| dp_boost | $\Delta p_{boost}$ | 過給圧が目標に入ったとみなす幅（利用者の設定） | Pa | 許容 | 系 |

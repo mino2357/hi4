@@ -82,7 +82,7 @@
 | D-17 | 過給機の軸と定常点（考え方） | D-00 D-15 D-16 | P-21 P-26 | – | `design/D-17.md`（441） | 4643 |
 | D-18 | 制御と運転 | D-00 | P-23 P-34 P-36 P-52 | 12 26 37 | `design/D-18.md`（479） | 1687 |
 | D-19 | 脈動の表示 | D-00 | 共通 | 15 17 31 | `design/D-19.md`（953） | 2551 |
-| D-20 | 検証の計画 | D-00 | 共通 | 20 | `design/D-20.md`（1331） | 2539 |
+| D-20 | 検証の計画 | D-00 | 共通 | 20 | `design/D-20.md`（1331） | 3033 |
 | D-21 | コードの構成（ice_2026 に合わせる） | – | 共通 | 13 20 | `design/D-21.md`（1263） | 4199 |
 | D-22 | 出典 | – | 共通 | – | `design/D-22.md`（2990） | 2990 |
 | D-23 | 筒内の 2 ゾーンと，NO の反応速度（拡大 Zeldovich 機構） | D-00 D-11 | P-63 | 29 | `design/D-23.md`（3532） | 9932 |
@@ -112,6 +112,7 @@
 | Q-15 | 遅い変数の方程式を直接解いて定常点への収束を早める案を採るか | 未決 | 利用者 | R-27 D-17 | `decisions/Q-15.md`（648） |
 | Q-16 | 実装の言語 | 決定（2026-11-28） | 利用者 | G-03 D-21 | `decisions/Q-16.md`（525） |
 | Q-17 | 式の正本を Rust の型付きの関数にするか，単位と形式的な検査をどこまで行うか | 未決 | 利用者 | D-21 | `decisions/Q-17.md`（819） |
+| Q-18 | 判定の定数（丸めの係数 c と，次数の余裕 δ） | 未決 | 仕様 | D-20 | `decisions/Q-18.md`（494） |
 
 ## 4. 企画（G）
 
@@ -170,10 +171,10 @@
 | `tools/dev/decide.js` | 2021 |
 | `tools/dev/docs.js` | 6164 |
 | `tools/dev/index.js` | 4281 |
-| `tools/dev/model.js` | 10599 |
-| `tools/dev/model_page.js` | 3949 |
-| `tools/dev/model_selftest.js` | 2772 |
+| `tools/dev/model.js` | 10713 |
+| `tools/dev/model_page.js` | 4125 |
+| `tools/dev/model_selftest.js` | 2768 |
 | `tools/dev/scope.js` | 1401 |
 | `docs/changes/2026-11-27-req-stage1.md` | 4785 |
 | `docs/changes/2026-11-27-scope-decisions.md` | 1568 |
-| `docs/changes/2026-11-28-model-pilot.md` | 2140 |
+| `docs/changes/2026-11-28-model-pilot.md` | 2714 |
