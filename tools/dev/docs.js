@@ -32,13 +32,13 @@ function load(){const items=[],errors=[],byId={};
  return{items,byId,errors}}
 /* 前提（requires）をたどった集まり（自分を含まない） */
 function closure(byId,id,key){const seen=new Set(),go=i=>{for(const r of list(byId[i]&&byId[i].fm[key]))if(!seen.has(r)){seen.add(r);go(r)}};go(id);seen.delete(id);return[...seen].sort()}
-/* 読む範囲：その番号の断片，前提（たどる），現象ならその設計の案（とその前提），その番号に関わる未決．返すのは {id, why}[] */
+/* 読む範囲：その番号の断片，前提（たどる），現象ならその設計の案（とその前提），その番号に関わる未決と決定．返すのは {id, why}[] */
 function scope(byId,items,id){const out=[],has=new Set(),add=(i,why)=>{if(byId[i]&&!has.has(i)){has.add(i);out.push({id:i,why})}},it=byId[id];
  add(id,'対象');
  if(it.kind==='P'){for(const r of closure(byId,id,'requires'))add(r,'前提の現象');for(const d of list(it.fm.design)){add(d,'設計の案');for(const r of closure(byId,d,'requires'))add(r,'設計の案の前提')}}
  if(it.kind==='D')for(const r of closure(byId,id,'requires'))add(r,'前提');
  if(it.kind==='Q')for(const a of list(it.fm.affects))add(a,'決定が関わる項目');
- const ids=new Set(out.map(o=>o.id));for(const q of items)if(q.kind==='Q'&&q.fm.status==='未決'&&list(q.fm.affects).some(a=>ids.has(a)))add(q.id,'関わる未決');
+ const ids=new Set(out.map(o=>o.id));for(const q of items)if(q.kind==='Q'&&list(q.fm.affects).some(a=>ids.has(a)))add(q.id,q.fm.status==='未決'?'関わる未決':'関わる決定');
  return out}
 const scopeSize=(byId,sc)=>sc.reduce((a,o)=>a+byId[o.id].n,0);
 /* 断片をまたぐ点検 */
