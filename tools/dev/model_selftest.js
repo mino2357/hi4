@@ -13,11 +13,12 @@ const T=[
  ['同じ量を 2 本の式で定める',add('eq-compressor.md','\n### E-C09：動力（別の式）\n- defines: P_c\n- uses: mdot_c h02s h01 eta_c\n\n```math\nP_c = \\dot m_c (h_{02s} - h_{01})/\\eta_c\n```\n'),['量 P_c を定める式が 2 本ある'],'errors'],
  ['量を定める式を消す',cut('eq-turbine.md','E-W05'),['量 H_m（twin-scroll：共通の空間の比全 enthalpy）を定める式が無い','に対応する式が無い（式が足りない）'],'errors'],
  ['定義していない量を使う',rep('eq-shaft.md','- uses: I_tc eta_m P_t P_c','- uses: I_tc eta_m P_t P_c x_rg'),['量 x_rg が量の表に無い'],'errors'],
- ['許容値を数で直接書く',rep('checks-turbo.md','| K-17 | R-27#1 | 保存 | E-S01 | $\\oint(\\eta_m P_t - P_c)dt = \\tfrac12 I_{tc}(\\omega_{n+1}^2 - \\omega_n^2)$ | eps_bal |','| K-17 | R-27#1 | 保存 | E-S01 | 釣り合い | 1e-6 |'),['K-17 の許容「1e-6」が，量の表の許容に無い'],'errors'],
- ['受入基準に対応する行を消す',rep('checks-turbo.md','| K-23 | R-27#7 |','| K-23 | R-27#6 |'),['要求 R-27 の受入基準 7 に対応する行が無い'],'errors'],
- ['同じ対象と種類に，違う許容値を掛ける',add('checks-turbo.md','| K-32 | R-27#1 | 保存 | E-S01 | 釣り合い（別の許容） | eps_int |\n'),['同じ対象と種類に，違う許容値：E-S01／保存'],'notes'],
+ ['許容値を数で直接書く',rep('checks-turbo.md','| eps_int |','| 1e-6 |'),['K-06 の許容「1e-6」が，量の表の許容に無い'],'errors'],
+ ['確かめることの対象に，無い式を書く',rep('checks-turbo.md','| K-07 | R-26 | 極限 | E-G01 |','| K-07 | R-26 | 極限 | E-G09 |'),['K-07 の対象 E-G09 が式に無い'],'errors'],
+ ['同じ対象と種類に，違う許容値を掛ける',add('checks-turbo.md','| K-16 | R-25 | 極限 | E-C05 | 別の許容 | eps_int |\n'),['同じ対象と種類に，違う許容値：E-C05／極限'],'notes'],
+ ['要求の本文が式のファイルを指していない',F=>{F.__req=r=>r.replace('docs/model/eq-shaft.md','docs/model/eq-xxx.md')},['要求 R-27 の本文が，式のファイル docs/model/eq-shaft.md を指していない'],'errors'],
  ['入力の量を式で定める',rep('eq-boost.md','- defines: p_boost\n','- defines: p_st\n'),['種類「入力」の量 p_st を定めている'],'errors'],
 ];
-let bad=0;for(const[name,mut,want,where]of T){const F=Object.assign({},files);mut(F);const A=M.analyze(F,reqs),out=A[where].join('\n'),miss=want.filter(w=>!out.includes(w));
+let bad=0;for(const[name,mut,want,where]of T){const F=Object.assign({},files);mut(F);const RQ=Object.assign({},reqs);if(F.__req){for(const k of Object.keys(RQ))RQ[k]=F.__req(RQ[k]);delete F.__req}const A=M.analyze(F,RQ),out=A[where].join('\n'),miss=want.filter(w=>!out.includes(w));
  console.log((miss.length?'FAIL':'PASS')+'  '+name+(miss.length?'\n      見つからなかった：'+miss.join('／')+'\n      出たもの：'+(out||'（無し）'):''));if(miss.length)bad++}
 console.log(bad?'自己検査 FAIL '+bad+' 件':'自己検査 PASS（'+T.length+' 件．どの食い違いも検出された）');process.exit(bad?1:0);

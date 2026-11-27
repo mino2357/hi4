@@ -64,6 +64,7 @@ h_{02} = h_{01} + \frac{h_{02s} - h_{01}}{\eta_c}
 
 ### E-C08：動力
 - defines: P_c
+- kind: 釣り合い
 - uses: mdot_c h02 h01
 
 ```math

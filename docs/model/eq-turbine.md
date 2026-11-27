@@ -80,6 +80,7 @@ P_t = \eta_t\,\dot m_t\,\Delta h_s
 
 ### E-T09：出口へ入る全 enthalpy
 - defines: Hd_t_out
+- kind: 釣り合い
 - uses: mdot_t h03 P_t
 - variant: タービンの入口=single
 
@@ -116,6 +117,7 @@ P_t = \eta_t\,\dot m_t\,\Delta h_s
 
 ### E-W04：共通の空間の質量の釣り合い（twin-scroll）
 - defines: p_m
+- kind: 釣り合い
 - uses: mdot_1 mdot_2 mdot_t
 - variant: タービンの入口=twin
 
@@ -125,6 +127,7 @@ P_t = \eta_t\,\dot m_t\,\Delta h_s
 
 ### E-W05：共通の空間の全 enthalpy（twin-scroll）
 - defines: H_m
+- kind: 釣り合い
 - uses: mdot_1 mdot_2 H1s H2s
 - variant: タービンの入口=twin
 
@@ -162,6 +165,7 @@ P_t = \sum_{i \in \mathcal I} \eta_t\!\left(\frac{U}{\sqrt{2\Delta h_{s,i}}}\rig
 
 ### E-W09：出口へ入る全 enthalpy（twin-scroll）
 - defines: Hd_t_out
+- kind: 釣り合い
 - uses: mdot_t H_m P_t
 - variant: タービンの入口=twin
 
