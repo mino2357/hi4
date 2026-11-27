@@ -21,7 +21,7 @@ function analyze(files,reqs){const errors=[],notes=[],E=m=>errors.push(m);
  /* 式 */
  const eqs=[],e_src={};for(const f of Object.keys(files).filter(f=>/^eq-/.test(f))){const t=files[f],fm=/^---\n([\s\S]*?)\n---\n/.exec(t),node=fm&&(/^node: (.+)$/m.exec(fm[1])||[])[1];
   if(!node||!nodes.has(node)){E(f+'：node が無いか，木に無い');continue}
-  for(const b of t.split(/^### /m).slice(1)){const h=/^(E-[A-Z]\d\d)：(.*)$/m.exec(b);if(!h){E(f+'：式の見出しが読めない：'+b.split('\n')[0]);continue}
+  for(const b of t.split(/^### /m).slice(1)){const h=/^(E-[A-Z]{1,2}\d\d)：(.*)$/m.exec(b);if(!h){E(f+'：式の見出しが読めない：'+b.split('\n')[0]);continue}
    const g=k=>(new RegExp('^- '+k+': (.*)$','m').exec(b)||[])[1]||'',e={id:h[1],title:h[2],node,file:f,defines:list(g('defines')),uses:list(g('uses')),kind:g('kind'),assumes:g('assumes'),variant:g('variant'),math:/```math\n[\s\S]*?\n```/.test(b)};
    if(eqs.some(x=>x.id===e.id))E(f+'：式 '+e.id+' が重なる');if(!e.math)E(f+'：式 '+e.id+' に式（```math）が無い');eqs.push(e)}
   e_src[f]=list((/^source: (.*)$/m.exec(fm[1])||[])[1]).filter(x=>/^R-\d\d$/.test(x))}

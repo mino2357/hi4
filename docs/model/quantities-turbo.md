@@ -17,7 +17,7 @@
 | H1s | $H_1$ | twin-scroll：スクロール 1 の比全 enthalpy | J/kg | 入力 | 外 |
 | H2s | $H_2$ | twin-scroll：スクロール 2 の比全 enthalpy | J/kg | 入力 | 外 |
 | p_st | $p_{st}$ | サージタンクの圧力 | Pa | 入力 | 外 |
-| mdot_f | $\dot m_f$ | 燃料の質量流量（1 サイクルの平均） | kg/s | 入力 | 外 |
+| mdot_f | $\dot m_f$ | 燃料の質量流量（1 サイクルの平均） | kg/s | 未知 | 運転と指標 |
 | T_ref | $T_{ref}$ | map の基準の温度 | K | 設定 | 過給機 |
 | p_ref | $p_{ref}$ | map の基準の圧力 | Pa | 設定 | 過給機 |
 | L_c | $L_c$ | コンプレッサの中の気体の柱の等価な長さ | m | 設定 | コンプレッサ |
