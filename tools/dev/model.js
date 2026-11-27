@@ -32,9 +32,12 @@ function analyze(files,reqs){const errors=[],notes=[],E=m=>errors.push(m);
   for(const a of e.assumes.split(';').map(s=>s.trim()).filter(Boolean)){const[g,v]=a.split('=');if(!AS[g])E(e.file+'：式 '+e.id+' の仮定の組「'+g+'」が無い');else if(AS[g].type!=='決定')E(e.file+'：式 '+e.id+' の assumes に，切替の組「'+g+'」がある（variant に書く）');else if(v!==AS[g].chosen)E(e.file+'：式 '+e.id+' は「'+g+'='+v+'」を前提にしているが，決定は「'+AS[g].chosen+'」（仮定の食い違い）')}
   if(e.variant){const[g,v]=e.variant.split('=');if(!AS[g]||AS[g].type!=='切替')E(e.file+'：式 '+e.id+' の variant の組「'+g+'」が切替の組に無い');else if(!AS[g].values.includes(v))E(e.file+'：式 '+e.id+' の variant の値「'+v+'」が無い')}}
  /* 切替の形ごとに：3（定義がちょうど 1 本），4（マッチング），7（連立の組） */
- const forms=[];for(const g of Object.keys(AS))if(AS[g].type==='切替')for(const v of AS[g].values)forms.push(g+'='+v);if(!forms.length)forms.push('');
- const rep=[];
- for(const form of forms){const act=eqs.filter(e=>!e.variant||e.variant===form),used=new Set(act.flatMap(e=>[...e.defines,...e.uses])),defs={};
+ /* 切替の形：どの組も既定（値の 1 番目）にしたものと，1 つの組だけを別の値にしたもの */
+ const SW=Object.keys(AS).filter(g=>AS[g].type==='切替'),dflt={};for(const g of SW)dflt[g]=AS[g].values[0];
+ const forms=[{label:'',pick:dflt}];for(const g of SW)for(const v of AS[g].values.slice(1))forms.push({label:g+'='+v,pick:Object.assign({},dflt,{[g]:v})});
+ const active=(e,F)=>{if(!e.variant)return true;const[g,v]=e.variant.split('=');return F.pick[g]===v};
+ const rep=[],loops=new Set();
+ for(const F of forms){const form=F.label||'既定',act=eqs.filter(e=>active(e,F)),used=new Set(act.flatMap(e=>[...e.defines,...e.uses])),defs={};
   for(const e of act)for(const q of e.defines)(defs[q]=defs[q]||[]).push(e.id);
   for(const q of used)if(qs[q]){const n=(defs[q]||[]).length;if(DEFK.includes(qs[q].kind)){if(n===0)E('［'+form+'］量 '+q+'（'+qs[q].mean+'）を定める式が無い');if(n>1)E('［'+form+'］量 '+q+' を定める式が '+n+' 本ある：'+defs[q].join(' '))}else if(n>0)E('［'+form+'］種類「'+qs[q].kind+'」の量 '+q+' を式 '+defs[q].join(' ')+' が定めている')}
   /* マッチング（節点ごと．宣言した defines によらず，式に現れる量だけから） */
@@ -45,11 +48,11 @@ function analyze(files,reqs){const errors=[],notes=[],E=m=>errors.push(m);
    const overE=es.filter((e,i)=>me[i]===undefined),underQ=us.filter(q=>mq[q]===undefined);
    for(const e of overE)E('［'+form+'］節点 '+node+'：式 '+e.id+'（'+e.title+'）に対応する量が無い（式が多すぎる．ほかの式と矛盾しうる）');
    for(const q of underQ)E('［'+form+'］節点 '+node+'：量 '+q+'（'+qs[q].mean+'）に対応する式が無い（式が足りない）');
-   rep.push({form,node,es,us})}
+   rep.push({form,F,node,es,us})}
   /* 連立の組：状態量は既知として，定める量 → 使う量 の強連結成分 */
   const dq=Object.keys(defs).filter(q=>qs[q]&&qs[q].kind!=='状態'),G={};for(const q of dq)G[q]=[...new Set(defs[q].flatMap(id=>act.find(e=>e.id===id).uses))].filter(u=>dq.includes(u));
   let idx=0;const st=[],on={},ind={},low={};const sc=v=>{ind[v]=low[v]=idx++;st.push(v);on[v]=1;for(const w of G[v]){if(ind[w]===undefined){sc(w);low[v]=Math.min(low[v],low[w])}else if(on[w])low[v]=Math.min(low[v],ind[w])}
-   if(low[v]===ind[v]){const c=[];let w;do{w=st.pop();on[w]=0;c.push(w)}while(w!==v);if(c.length>1)notes.push('［'+form+'］連立して解く組：'+c.sort().join(' '))}};
+   if(low[v]===ind[v]){const c=[];let w;do{w=st.pop();on[w]=0;c.push(w)}while(w!==v);if(c.length>1){const t=c.sort().join(' ');if(!loops.has(t)){loops.add(t);notes.push('連立して解く組'+(F.label?'［'+F.label+'］':'')+'：'+t)}}}};
   for(const q of dq)if(ind[q]===undefined)sc(q)}
  /* 6：確かめること */
  const ks=[];for(const f of Object.keys(files).filter(f=>/^checks-/.test(f)))for(const r of rows(files[f])){const k={id:r[0],crit:r[1],type:r[2],target:list(r[3]).filter(x=>x!=='–'),text:r[4],tol:r[5],file:f};ks.push(k);
@@ -71,7 +74,7 @@ function analyze(files,reqs){const errors=[],notes=[],E=m=>errors.push(m);
  for(const g of Object.keys(sig))if(sig[g].length>1)notes.push('同じ要求・種類・対象の行が重なっている（1 つにまとめられないか）：'+sig[g].join(' ')+'（'+g+'）');
  /* 報告 */
  const o=['# 検査の結果（自動生成）','','`npm run model` が作る．手で書き換えない．定めは `README.md`．','','量 '+Object.keys(qs).length+' 個，式 '+eqs.length+' 本，確かめること '+ks.length+' 行．','','## 1. 誤り','',errors.length?errors.map(e=>'- '+e).join('\n'):'無し．','','## 2. 知らせ（誤りではない）','',notes.length?notes.map(e=>'- '+e).join('\n'):'無し．','','## 3. 節点ごとの，量と，それを定める式','','切替の形ごと．「使う式」は，その量が現れるほかの式．'];
- for(const r of rep){o.push('','### '+r.node+(r.form?'［'+r.form+'］':''),'','| 量 | 意味 | 種類 | 定める式 | 使う式 |','| :--- | :--- | :--- | :--- | :--- |');const act=eqs.filter(e=>!e.variant||e.variant===r.form);
+ for(const r of rep){if(r.F.label&&!r.es.some(e=>e.variant===r.F.label))continue;o.push('','### '+r.node+'［'+r.form+'］','','| 量 | 意味 | 種類 | 定める式 | 使う式 |','| :--- | :--- | :--- | :--- | :--- |');const act=eqs.filter(e=>active(e,r.F));
   for(const q of r.us)o.push('| '+q+' '+qs[q].tex+' | '+qs[q].mean+' | '+qs[q].kind+' | '+(act.filter(e=>e.defines.includes(q)).map(e=>e.id).join(' ')||'**無し**')+' | '+(act.filter(e=>e.uses.includes(q)).map(e=>e.id).join(' ')||'–')+' |')}
  o.push('','## 4. 検査の数と，式ごとの対象','','検査は 3 種類だけ：(1) 表に書いた行（対象の式の誤りを見分けるもの），(2) 保存（系の全体で，質量，エネルギー，原子の 3 つ．釣り合いの式と状態量の式の全部が対象），(3) 式との一致（どの行の対象にもならない式だけ．基準の値を 1 組）．','',
   '数：表の行 '+ks.length+'，保存 3，式との一致 '+lone.length+'（計 '+(ks.length+3+lone.length)+'）．式 '+eqs.length+' 本のうち，表の行が対象にする式 '+eqs.filter(e=>cnt[e.id]>0).length+' 本，保存だけが対象にする式 '+eqs.filter(e=>cnt[e.id]===0&&bal.includes(e.id)).length+' 本．','','| 式 | 題 | 表の行 | 保存 | 式との一致 |','| :--- | :--- | :--- | :--- | :--- |');
