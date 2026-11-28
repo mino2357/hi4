@@ -1,6 +1,6 @@
 ---
 node: 回転系
-source: D-14 R-19 R-36
+source: D-14 R-19
 ---
 
 # 式：回転系と動力計
@@ -59,17 +59,7 @@ T_f = T_f(\omega,\ p)
 ### E-D07：動力計のトルク（回転数を保つ制御か，与えた値．制御則は仕様）
 - defines: T_L
 - uses: omega
-- variant: 負荷=動力計
 
 ```math
 T_L = \mathcal C_L(\omega - \omega_{target}) \quad \text{または} \quad T_L = T_{L,set}
-```
-
-### E-D08：車両をつないだときの負荷のトルク（走行抵抗と，車両の加速の分）
-- defines: T_L
-- uses: F_res m_veh v_veh r_w i_g i_f eta_dr
-- variant: 負荷=車両
-
-```math
-T_L = \left(F_r + m_v\,\frac{dv}{dt}\right)\frac{r_w}{i_g\,i_f\,\eta_d}
 ```
