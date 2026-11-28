@@ -49,24 +49,24 @@ C_s = \sqrt{2\,\Delta h_s}
 U = \tfrac12 D_t\,\omega_{tc}
 ```
 
-### E-T06：効率（速度比の関数．式は Q-08）
+### E-T06：効率（速度比の 2 次式．広く使われる形だが，出典はこの場では開いて確かめられていない）
 - defines: eta_t
-- uses: U C_s
+- uses: U C_s eta_t_max nu_opt
 - assumes: タービンの特性=準定常
 - variant: タービンの入口=single
 
 ```math
-\eta_t = \mathrm{H}_t\!\left(\frac{U}{C_s}\right)
+\eta_t = \max\!\left(\eta_{t,max}\left[1 - \left(\frac{\nu - \nu_{opt}}{\nu_{opt}}\right)^2\right],\ 0\right), \qquad \nu = \frac{U}{C_s}
 ```
 
-### E-T07：流量（式は Q-08）
+### E-T07：流量（翼車の絞り．スクロールの出口の絞りと直列）
 - defines: mdot_t
-- uses: p03 T03 pi_t N_corr_t p_ref T_ref
+- uses: A_r p_m T03 p4
 - assumes: タービンの特性=準定常
 - variant: タービンの入口=single
 
 ```math
-\dot m_t = \frac{p_{03}/p_{ref}}{\sqrt{T_{03}/T_{ref}}}\;\Phi_t(\pi_t,\ N_{corr,t})
+\dot m_t = A_r\,\frac{p_m}{\sqrt{R T_{03}}}\,\Psi\!\left(\frac{p_4}{p_m}\right)
 ```
 
 ### E-T08：仕事率
@@ -86,6 +86,15 @@ P_t = \eta_t\,\dot m_t\,\Delta h_s
 
 ```math
 \dot H_{t,out} = \dot m_t\,h_{03} - P_t
+```
+
+### E-T10：スクロールの出口と翼車の間の圧力（single-scroll．絞りの流量 = 翼車の流量）
+- defines: p_m
+- uses: A_n p03 T03 mdot_t
+- variant: タービンの入口=single
+
+```math
+2A_n\,\frac{p_{03}}{\sqrt{R T_{03}}}\,\Psi\!\left(\frac{p_m}{p_{03}}\right) = \dot m_t
 ```
 
 ### E-W01：絞り 1（twin-scroll）
