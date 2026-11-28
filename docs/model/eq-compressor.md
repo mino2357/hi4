@@ -29,12 +29,12 @@ N_{corr} = \frac{\omega_{tc}}{\sqrt{T_{01}/T_{ref}}}
 s\big(T_{02s},\ p_{01}\Pi_c\big) = s\big(T_{01},\ p_{01}\big), \qquad h(T_{02s}) = h_{02s}
 ```
 
-### E-C04：効率（流量係数の 2 次式．置いた形で，文献の式ではない）
+### E-C04：効率（置かずに，仕事と揚程から導く．出力）
 - defines: eta_c
-- uses: Phi_c Phi_opt eta_c_max eta_c_min
+- uses: h01 h02 h02s
 
 ```math
-\eta_c = \max\!\left(\eta_{c,max}\left[1 - \left(\frac{\Phi_c - \Phi_{opt}}{\Phi_{opt}}\right)^2\right],\ \eta_{c,min}\right)
+\eta_c = \frac{h_{02s} - h_{01}}{h_{02} - h_{01}} = \frac{\Psi_c}{2\sigma_c}
 ```
 
 ### E-C05：流量の運動方程式
@@ -54,12 +54,12 @@ s\big(T_{02s},\ p_{01}\Pi_c\big) = s\big(T_{01},\ p_{01}\big), \qquad h(T_{02s})
 h_{02s} = h_{01} + \Psi_c\,\tfrac12 U_c^2
 ```
 
-### E-C07：出口の比 enthalpy（効率の定義）
+### E-C07：出口の比 enthalpy（翼車がする仕事．Euler の式）
 - defines: h02
-- uses: h01 h02s eta_c
+- uses: h01 sigma_c U_c
 
 ```math
-h_{02} = h_{01} + \frac{h_{02s} - h_{01}}{\eta_c}
+h_{02} = h_{01} + \sigma_c\,U_c^2
 ```
 
 ### E-C08：動力
